@@ -1,5 +1,6 @@
-import { Alert, Button, Card, Descriptions, Space, Spin, Steps, Typography } from 'antd'
+import { Alert, Button, Descriptions, Space, Spin, Steps } from 'antd'
 import { useEffect, useState } from 'react'
+import { PageShell } from '@app/shell'
 import { useI18n } from '@shared/i18n'
 import { getLoanProgress } from './dkjdcx/api'
 import { getProgressStepIndex, loanProgressSteps, type LoanProgressSnapshot } from './dkjdcx/model'
@@ -53,15 +54,12 @@ export function DkjdcxPage() {
   const currentProgressLabel = progress ? t(loanProgressSteps[currentStep].titleKey) : ''
 
   return (
-    <Card
+    <PageShell
       title={t('dkjdcx.page.title')}
+      description={t('dkjdcx.page.description')}
       extra={<Button onClick={loadProgress}>{t('dkjdcx.actions.refresh')}</Button>}
     >
       <Space orientation="vertical" size="large" className="dkjdcx-page">
-        <Typography.Paragraph className="dkjdcx-page__summary">
-          {t('dkjdcx.page.description')}
-        </Typography.Paragraph>
-
         {error && (
           <Alert
             type="error"
@@ -93,6 +91,6 @@ export function DkjdcxPage() {
           )}
         </Spin>
       </Space>
-    </Card>
+    </PageShell>
   )
 }

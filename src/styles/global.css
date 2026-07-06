@@ -1,7 +1,7 @@
 :root {
-  color: #182033;
-  background: #eef2f7;
-  font-family: "Alibaba PuHuiTi", "Microsoft YaHei", sans-serif;
+  color: var(--fj-color-text-primary, #182033);
+  background: var(--fj-color-page-background, #eef2f7);
+  font-family: var(--fj-font-family, "Alibaba PuHuiTi", "Microsoft YaHei", sans-serif);
 }
 
 * {
@@ -54,13 +54,30 @@ body {
 }
 
 .dkjdcx-page,
-.dkjdcx-page__content {
+.dkjdcx-page__content,
+.page-shell {
   width: 100%;
 }
 
-.dkjdcx-page__summary.ant-typography {
+.page-shell__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.page-shell__title.ant-typography {
   margin-bottom: 0;
-  color: rgba(24, 32, 51, 0.72);
+}
+
+.page-shell__description.ant-typography {
+  margin: 8px 0 0;
+  max-width: 760px;
+  color: var(--fj-color-text-secondary, rgba(24, 32, 51, 0.72));
+}
+
+.page-shell__body.ant-card {
+  border-color: var(--fj-color-border-subtle, rgba(24, 32, 51, 0.08));
 }
 
 @media (max-width: 760px) {
@@ -76,5 +93,13 @@ body {
 
   .layout-content {
     padding: 20px;
+  }
+
+  .page-shell__header {
+    display: block;
+  }
+
+  .page-shell__extra {
+    margin-top: 16px;
   }
 }
