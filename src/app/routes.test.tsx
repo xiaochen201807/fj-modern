@@ -31,7 +31,7 @@ describe('routes', () => {
       </I18nProvider>
     )
 
-    expect(await screen.findByText('旧路由静态进度')).toBeInTheDocument()
-    expect(await screen.findAllByText('受理')).toHaveLength(2)
+    expect(await screen.findByText('贷款进度查询')).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '刷新进度' })).toBeInTheDocument()
   })
 })
