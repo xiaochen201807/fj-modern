@@ -1,20 +1,24 @@
 import { Card, Typography } from 'antd'
+import { useI18n } from '@shared/i18n'
 
 type DxslglEntryPageProps = {
   flow: 'fq' | 'sp' | 'th'
 }
 
-const flowNames = {
-  fq: '对象实例发起',
-  sp: '对象实例审批',
-  th: '对象实例退回'
-}
+const flowNameKeys = {
+  fq: 'dxslgl.flow.fq',
+  sp: 'dxslgl.flow.sp',
+  th: 'dxslgl.flow.th'
+} as const
 
 export function DxslglEntryPage({ flow }: DxslglEntryPageProps) {
+  const { t } = useI18n()
+  const flowName = t(flowNameKeys[flow])
+
   return (
-    <Card title={`${flowNames[flow]}迁移占位`}>
+    <Card title={t('dxslgl.placeholder.title', { flowName })}>
       <Typography.Paragraph>
-        旧对象实例模块依赖较多，迁移时先抽离公共 utils、表单协议和流程状态，再迁入具体页面。
+        {t('dxslgl.placeholder.description')}
       </Typography.Paragraph>
     </Card>
   )

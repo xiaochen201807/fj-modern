@@ -1,10 +1,13 @@
 import { Card, Typography } from 'antd'
+import { useI18n } from '@shared/i18n'
 
 export function DkjdcxPage() {
+  const { t } = useI18n()
+
   return (
-    <Card title="贷款进度查询迁移占位">
+    <Card title={t('dkjdcx.placeholder.title')}>
       <Typography.Paragraph>
-        旧路由来源：src/matter/bb2gjjywmxweb/pages/dk/dkjdcx/index。迁移时优先拆分接口请求、表单状态和展示组件。
+        {t('dkjdcx.placeholder.description')}
       </Typography.Paragraph>
     </Card>
   )

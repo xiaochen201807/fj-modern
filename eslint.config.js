@@ -19,7 +19,30 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }]
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'axios',
+              message: 'Use src/shared/api instead of importing axios directly.'
+            }
+          ],
+          patterns: [
+            {
+              group: ['@features/*', '../features/*', '../../features/*'],
+              message: 'Feature modules must not import other features directly. Extract domain-neutral code to shared first.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/shared/api/**/*.{ts,tsx}', 'src/app/routes.tsx'],
+    rules: {
+      'no-restricted-imports': 'off'
     }
   }
 )
