@@ -41,6 +41,12 @@ npm run lint
 
 迁移进度记录在 [`docs/migration.md`](docs/migration.md)。
 
+### 文档入口
+
+- GitHub Pages: [https://xiaochen201807.github.io/fj-modern/](https://xiaochen201807.github.io/fj-modern/)
+- Wiki: [https://github.com/xiaochen201807/fj-modern/wiki](https://github.com/xiaochen201807/fj-modern/wiki)
+- Roadmap Project: [fj-modern Roadmap](https://github.com/users/xiaochen201807/projects/3)
+
 ### 国际化目标
 
 未来版本需要支撑多国语言，因此新增业务页面不得硬编码用户可见文案。页面标题、按钮、表单校验、提示信息、错误信息、表格列名和状态文本都应通过统一 i18n 资源管理。
@@ -87,6 +93,12 @@ Start with high-value entry routes from the old project:
 - `/dxslglComp/dxslglth/index`
 
 Track progress in [`docs/migration.md`](docs/migration.md).
+
+### Documentation Entry Points
+
+- GitHub Pages: [https://xiaochen201807.github.io/fj-modern/](https://xiaochen201807.github.io/fj-modern/)
+- Wiki: [https://github.com/xiaochen201807/fj-modern/wiki](https://github.com/xiaochen201807/fj-modern/wiki)
+- Roadmap Project: [fj-modern Roadmap](https://github.com/users/xiaochen201807/projects/3)
 
 ### Internationalization Goal
 
