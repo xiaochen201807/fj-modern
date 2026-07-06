@@ -228,6 +228,45 @@ shared/api/
 - query 参数、qiankun 注入参数和父应用上下文必须通过 shared adapter 读取。
 - 错误处理应返回类型化应用错误，UI 不解析原始后端错误结构。
 
+### 网关上下文标准
+
+所有页面入口和后续业务请求都必须通过 `src/shared/gateway` 读取、校验和透传网关上下文。业务 feature 不得直接读取 `window.SY_QIANKUN`、`window.IS_SY_QIANKUN`、`window.__POWERED_BY_QIANKUN__`，也不得手动拼接网关 headers。
+
+当前边界：
+
+```text
+src/shared/gateway/
+  types.ts             网关上下文、校验结果和 headers 类型
+  parse.ts             从 qiankun props、URL 和 dev mock 解析上下文
+  validate.ts          前端基础结构校验
+  headers.ts           生成请求透传 headers
+  GatewayProvider.tsx  应用级上下文 Provider
+  useGateway.ts        业务读取网关状态的 public hook
+  context.ts           request 层读取当前上下文的运行时存储
+```
+
+`src/shared/api/request.ts` 会自动合并 `createGatewayHeaders()`，所以业务 API 函数只需要描述业务请求：
+
+```ts
+export function getLoanProgress(params: LoanProgressQuery) {
+  return request<LoanProgressResponse>({
+    url: '/loan/progress',
+    method: 'GET',
+    params
+  })
+}
+```
+
+前端 SDK 的安全边界：
+
+- 只做统一解析、基础结构校验、headers 生成和开发模式 mock。
+- 不保存服务端密钥、签名密钥或可提升权限的秘密。
+- 不把前端传入的用户、机构、租户、角色当作可信事实。
+- 可信鉴权、token 过期、签名校验、重放保护和数据范围过滤必须在网关或后端完成。
+- 生产环境不得依赖 dev mock context。
+
+如果需要临时兼容旧网关字段，应在 `src/shared/gateway/parse.ts` 中集中映射，不得散落到业务页面。
+
 ### 状态管理标准
 
 默认使用本地 React state 和 feature hooks。只有证明必要时才引入更重的状态方案。
@@ -757,6 +796,45 @@ Rules:
 - Request cancellation should be used for route-level async queries where stale responses are possible.
 - Query params, qiankun injected params, and parent context must be read through shared adapters.
 - Error handling must return typed application errors. UI should not parse raw backend error shapes.
+
+### Gateway Context Standard
+
+All page entry points and follow-up business requests must read, validate, and propagate gateway context through `src/shared/gateway`. Feature code must not read `window.SY_QIANKUN`, `window.IS_SY_QIANKUN`, or `window.__POWERED_BY_QIANKUN__` directly, and it must not manually compose gateway headers.
+
+Current boundary:
+
+```text
+src/shared/gateway/
+  types.ts             Gateway context, validation result, and headers types
+  parse.ts             Context parsing from qiankun props, URL, and dev mock
+  validate.ts          Frontend structural validation
+  headers.ts           Request propagation headers
+  GatewayProvider.tsx  App-level context provider
+  useGateway.ts        Public hook for reading gateway state
+  context.ts           Runtime storage used by the request layer
+```
+
+`src/shared/api/request.ts` automatically merges `createGatewayHeaders()`, so business API functions only describe business requests:
+
+```ts
+export function getLoanProgress(params: LoanProgressQuery) {
+  return request<LoanProgressResponse>({
+    url: '/loan/progress',
+    method: 'GET',
+    params
+  })
+}
+```
+
+Security boundary of the frontend SDK:
+
+- It only centralizes parsing, basic structural validation, header generation, and development-mode mocks.
+- It does not store server secrets, signing keys, or privilege-escalating secrets.
+- It does not treat user, organization, tenant, or role fields from the frontend as trusted facts.
+- Trusted authentication, token expiry, signature checks, replay protection, and data-scope filtering must happen in the gateway or backend.
+- Production must not rely on dev mock context.
+
+If legacy gateway fields need temporary compatibility, map them centrally in `src/shared/gateway/parse.ts` instead of scattering them across business pages.
 
 ### State Management Standard
 

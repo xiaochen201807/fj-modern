@@ -58,10 +58,29 @@ export default tseslint.config(
           ],
           patterns: [
             {
+              group: ['@shared/gateway/*', '../shared/gateway/*', '../../shared/gateway/*'],
+              message: 'Feature code must use @shared/gateway public API instead of deep-importing gateway internals.'
+            },
+            {
               group: ['@features/*', '../features/*', '../../features/*'],
               message: 'Feature modules must not import other features directly. Extract domain-neutral code to shared first.'
             }
           ]
+        }
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "MemberExpression[object.name='window'][property.name='SY_QIANKUN']",
+          message: 'Feature code must not read window.SY_QIANKUN directly. Use @shared/gateway or @shared/qiankun public APIs.'
+        },
+        {
+          selector: "MemberExpression[object.name='window'][property.name='IS_SY_QIANKUN']",
+          message: 'Feature code must not read qiankun globals directly. Use @shared/gateway or @shared/qiankun public APIs.'
+        },
+        {
+          selector: "MemberExpression[object.name='window'][property.name='__POWERED_BY_QIANKUN__']",
+          message: 'Feature code must not read qiankun globals directly. Use @shared/gateway or @shared/qiankun public APIs.'
         }
       ]
     }
