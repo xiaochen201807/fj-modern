@@ -40,6 +40,33 @@ export default tseslint.config(
     }
   },
   {
+    files: ['src/features/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'axios',
+              message: 'Use src/shared/api instead of importing axios directly.'
+            },
+            {
+              name: 'antd',
+              importNames: ['ConfigProvider'],
+              message: 'Feature code must not configure Ant Design directly. Use app providers and shared/theme.'
+            }
+          ],
+          patterns: [
+            {
+              group: ['@features/*', '../features/*', '../../features/*'],
+              message: 'Feature modules must not import other features directly. Extract domain-neutral code to shared first.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
     files: ['src/shared/api/**/*.{ts,tsx}', 'src/app/routes.tsx'],
     rules: {
       'no-restricted-imports': 'off',

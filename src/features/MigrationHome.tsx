@@ -17,7 +17,7 @@ export function MigrationHome() {
   const { t } = useI18n()
 
   return (
-    <Space direction="vertical" size="large" className="page-stack">
+    <Space orientation="vertical" size="large" className="page-stack">
       <div>
         <Typography.Title>{t('migration.home.title')}</Typography.Title>
         <Typography.Paragraph>
@@ -27,7 +27,7 @@ export function MigrationHome() {
       <div className="migration-grid">
         {migrationTargets.map(item => (
           <Card key={item.route} title={item.route}>
-            <Space direction="vertical">
+            <Space orientation="vertical">
               <Tag color={item.priorityKey === 'migration.priority.p0' ? 'red' : 'blue'}>{t(item.priorityKey)}</Tag>
               <Typography.Text code>{item.source}</Typography.Text>
             </Space>

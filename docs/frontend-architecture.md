@@ -144,6 +144,50 @@ features/<domain>/<feature>/
 
 不要立即包装所有 Ant Design 组件。只封装应用需要一致行为的组件。
 
+### 平台层与主题边界
+
+迁移后的业务开发目标是只修改 `features/<domain>/<feature>` 下的业务代码。主题、页面框架、全局 providers、网关上下文、请求透传、错误边界和通用 UI 组件都属于平台层，不应在业务页面中重复实现。
+
+当前项目先在 app 内建立未来可抽包的边界：
+
+```text
+src/app/providers/       应用级 Provider 编排，例如 i18n、theme、后续 gateway/api provider
+src/app/shell/           应用页面框架，例如 PageShell、错误边界、权限兜底页
+src/shared/theme/        design tokens、Ant Design theme adapter、CSS variables、ThemeProvider
+src/shared/ui/           项目级通用 UI 组件 public API
+src/shared/gateway/      后续网关上下文 SDK，见独立 Issue
+src/shared/testing/      后续测试工具，减少业务测试样板
+```
+
+业务 feature 允许使用平台 public API，例如 `@app/shell`、`@shared/ui`、`@shared/api` 和 `@shared/i18n`。业务 feature 不得直接配置 `ConfigProvider`、不得创建 axios 实例、不得直接读取 qiankun 或网关全局变量。
+
+主题拆分为两个概念：
+
+| 层级 | 当前位置 | 未来包名 | 职责 |
+|---|---|---|---|
+| Design tokens | `src/shared/theme/tokens.ts` | `@fj/tokens` | 颜色、字体、间距、圆角、阴影、状态色等不依赖 React 的设计变量 |
+| Theme adapter | `src/shared/theme` | `@fj/theme` | Ant Design theme、CSS variables、ThemeProvider 和 locale bridge |
+
+`PageShell` 是页面根框架的唯一入口。业务页面应把标题、描述和页面级操作交给 `PageShell`，页面内部只装配业务组件。
+
+```tsx
+export function BusinessPage() {
+  return (
+    <PageShell title={t('business.page.title')} description={t('business.page.description')}>
+      <BusinessPanel />
+    </PageShell>
+  )
+}
+```
+
+`src/shared/ui` 的组件准入标准：
+
+- 至少两个页面或一个明确近期页面会复用。
+- 不绑定具体业务字段、接口、流程编码或机构编码。
+- 不硬编码业务中文文案。
+- 通过 public `index.ts` 导出，不允许业务 deep import 内部实现。
+- 非平凡行为必须有测试。
+
 第一批 `shared/ui` 候选：
 
 | 组件 | 目的 |
@@ -272,6 +316,30 @@ features/<domain>/<feature>/i18n/
 ### NPM 包策略
 
 项目应有意识地使用 npm 包。内部复用代码只有在复用和 owner 清晰后才应成为包。
+
+平台层最终可以拆为私有包，但必须先在当前仓库内按包边界沉淀。不要因为“公共”就立即发布 npm 包；抽包必须服务于跨应用复用和版本治理。
+
+推荐演进路线：
+
+```text
+阶段 1：src/shared 与 src/app 内部模块化
+阶段 2：迁移 2-3 条真实路由后改为 pnpm workspace packages
+阶段 3：多个应用复用时发布到私有 npm / GitHub Packages
+```
+
+未来建议包边界：
+
+| 包名 | 依赖方向 | 职责 |
+|---|---|---|
+| `@fj/tokens` | 无 React/Ant Design 依赖 | 设计变量 |
+| `@fj/theme` | 依赖 `@fj/tokens` | ThemeProvider、Ant Design theme、CSS variables |
+| `@fj/ui` | 依赖 `@fj/theme`、`@fj/i18n` | 通用 UI 组件 |
+| `@fj/app-shell` | 依赖 theme/ui/gateway/i18n | AppShell、PageShell、错误边界、权限兜底 |
+| `@fj/gateway-client` | 不依赖业务 feature | 网关上下文解析、基础校验、请求透传数据生成 |
+| `@fj/api-client` | 依赖 gateway-client | 统一 request、错误模型、headers 注入 |
+| `@fj/testing` | 依赖 providers 和 testing library | renderWithProviders、mock gateway、route smoke helpers |
+
+依赖方向必须单向：`tokens -> theme -> ui -> app-shell -> app`。禁止 theme 依赖 app-shell、ui 依赖业务 feature、tokens 依赖 React。
 
 | 类别 | 位置 | 发布策略 |
 |---|---|---|
@@ -606,6 +674,50 @@ A component is eligible for `shared` only when all conditions are true:
 
 Do not wrap every Ant Design component immediately. Wrap only components where the application needs consistent behavior.
 
+### Platform Layer And Theme Boundaries
+
+The target model is that business developers only change code under `features/<domain>/<feature>`. Theme setup, page shell, app providers, gateway context, request propagation, error boundaries, and shared UI components belong to the platform layer and must not be reimplemented in business pages.
+
+The project currently keeps package-ready boundaries inside the app:
+
+```text
+src/app/providers/       App-level provider composition, such as i18n, theme, and future gateway/api providers
+src/app/shell/           App page shell, such as PageShell, error boundaries, and permission fallback pages
+src/shared/theme/        Design tokens, Ant Design theme adapter, CSS variables, and ThemeProvider
+src/shared/ui/           Project-level shared UI public API
+src/shared/gateway/      Future gateway context SDK, tracked by a separate Issue
+src/shared/testing/      Future test helpers to reduce business test boilerplate
+```
+
+Feature code may use platform public APIs such as `@app/shell`, `@shared/ui`, `@shared/api`, and `@shared/i18n`. Feature code must not configure `ConfigProvider` directly, create axios instances, or read qiankun/gateway globals directly.
+
+Theme is split into two concepts:
+
+| Layer | Current Location | Future Package | Responsibility |
+|---|---|---|---|
+| Design tokens | `src/shared/theme/tokens.ts` | `@fj/tokens` | React-agnostic color, font, spacing, radius, shadow, and status tokens |
+| Theme adapter | `src/shared/theme` | `@fj/theme` | Ant Design theme, CSS variables, ThemeProvider, and locale bridge |
+
+`PageShell` is the single page-root framework entry. Business pages should pass title, description, and page-level actions to `PageShell`; the page body should only compose business components.
+
+```tsx
+export function BusinessPage() {
+  return (
+    <PageShell title={t('business.page.title')} description={t('business.page.description')}>
+      <BusinessPanel />
+    </PageShell>
+  )
+}
+```
+
+Admission rules for `src/shared/ui`:
+
+- It is reused by at least two pages, or there is a clear near-term second consumer.
+- It does not bind to business fields, endpoints, workflow codes, or organization codes.
+- It does not hard-code business Chinese text.
+- It is exported through the public `index.ts`; business code must not deep-import internals.
+- Non-trivial behavior has tests.
+
 First-wave `shared/ui` candidates:
 
 | Component | Purpose |
@@ -734,6 +846,30 @@ Every file in `src/legacy` must include:
 ### NPM Package Strategy
 
 The project should use npm packages deliberately. Internal reusable code should become packages only when reuse and ownership are clear.
+
+The platform layer can eventually become private packages, but it must first stabilize inside this repository using package-like boundaries. Do not publish npm packages only because code is "shared"; package extraction must serve cross-app reuse and version governance.
+
+Recommended evolution:
+
+```text
+Phase 1: Internal modules under src/shared and src/app
+Phase 2: Move to pnpm workspace packages after 2-3 real route migrations
+Phase 3: Publish to private npm / GitHub Packages when multiple apps reuse them
+```
+
+Recommended future package boundaries:
+
+| Package | Dependency Direction | Responsibility |
+|---|---|---|
+| `@fj/tokens` | No React/Ant Design dependency | Design tokens |
+| `@fj/theme` | Depends on `@fj/tokens` | ThemeProvider, Ant Design theme, CSS variables |
+| `@fj/ui` | Depends on `@fj/theme`, `@fj/i18n` | Shared UI components |
+| `@fj/app-shell` | Depends on theme/ui/gateway/i18n | AppShell, PageShell, error boundaries, permission fallbacks |
+| `@fj/gateway-client` | No business feature dependency | Gateway context parsing, basic validation, request propagation data |
+| `@fj/api-client` | Depends on gateway-client | Unified request, error model, headers injection |
+| `@fj/testing` | Depends on providers and testing library | renderWithProviders, mock gateway, route smoke helpers |
+
+Dependencies must stay one-way: `tokens -> theme -> ui -> app-shell -> app`. Theme must not depend on app-shell, ui must not depend on business features, and tokens must not depend on React.
 
 | Category | Location | Publishing |
 |---|---|---|
