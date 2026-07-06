@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react'
+import { GatewayProvider } from '@shared/gateway'
 import { I18nProvider, useI18n } from '@shared/i18n'
 import { ThemeProvider } from '@shared/theme'
 import type { NormalizedQiankunProps } from '@shared/qiankun/runtime'
@@ -9,9 +10,11 @@ type AppProvidersProps = PropsWithChildren<{
 
 export function AppProviders({ children, qiankun }: AppProvidersProps) {
   return (
-    <I18nProvider>
-      <ThemedAppFrame qiankun={qiankun}>{children}</ThemedAppFrame>
-    </I18nProvider>
+    <GatewayProvider qiankun={qiankun}>
+      <I18nProvider>
+        <ThemedAppFrame qiankun={qiankun}>{children}</ThemedAppFrame>
+      </I18nProvider>
+    </GatewayProvider>
   )
 }
 
