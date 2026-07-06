@@ -1,0 +1,35 @@
+name: Feature Request / 功能需求
+description: Propose a user-facing or engineering feature / 提出用户功能或工程能力
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: Background / 背景
+      description: Why is this needed? / 为什么需要？
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope / 范围
+      description: What should be included and excluded? / 包含和不包含什么？
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria / 验收标准
+      placeholder: |
+        - 
+        - 
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification Plan / 验证方式
+      placeholder: |
+        - pnpm lint
+        - pnpm build

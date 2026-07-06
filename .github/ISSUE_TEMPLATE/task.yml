@@ -1,0 +1,36 @@
+name: Task / 任务
+description: Track an implementation or project-management task / 跟踪实现或项目管理任务
+title: "[Task] "
+labels: ["task"]
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: Background / 背景
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables / 交付物
+      placeholder: |
+        - 
+        - 
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria / 验收标准
+      placeholder: |
+        - 
+        - 
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification / 验证方式
+      placeholder: |
+        - pnpm lint
+        - pnpm build
