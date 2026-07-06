@@ -53,6 +53,16 @@ body {
   gap: 16px;
 }
 
+.dkjdcx-page,
+.dkjdcx-page__content {
+  width: 100%;
+}
+
+.dkjdcx-page__summary.ant-typography {
+  margin-bottom: 0;
+  color: rgba(24, 32, 51, 0.72);
+}
+
 @media (max-width: 760px) {
   .layout-root {
     display: block;
